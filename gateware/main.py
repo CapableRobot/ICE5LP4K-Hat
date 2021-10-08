@@ -27,7 +27,7 @@ def main():
     soc.submodules.trigger  = trigger.TriggerController(soc.wall.strobe, 8, io)
     soc.add_csr("trigger")
 
-    builder = Builder(soc, output_dir="build", csr_csv="csr.csv", compile_software=False)
+    builder = Builder(soc, output_dir="build", csr_csv="build/csr.csv", compile_software=False)
     builder.build()
 
     print("Bitstream : {}".format(os.path.join(builder.gateware_dir, soc.build_name + ".bin")))
