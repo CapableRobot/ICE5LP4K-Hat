@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "ICE5LP4K-PI-HAT-[CRXPRK]-rescue")(type "Legacy")(uri "${KIPRJMOD}/ICE5LP4K PI HAT [CRXPRK]-rescue.lib")(options "")(descr ""))
+)
