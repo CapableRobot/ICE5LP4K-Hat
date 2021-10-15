@@ -16,8 +16,8 @@ def main():
 
     soc = platform.BaseSoC()
 
-    ## soc.submodules.rgb = platform.RGBLed(led_pads)
-    ## soc.add_csr("rgb")
+    soc.submodules.rgb = platform.RGBLed(soc.platform.request("rgb_led"))
+    soc.add_csr("rgb")
 
     ## Create a 1 kHz clock (1 ms) so that register 
     ## settings are in ms instead of 1/6 us intervals
