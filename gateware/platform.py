@@ -19,7 +19,7 @@ import spi_slave
 
 class RGBLed(Module, AutoCSR):
     def __init__(self, pads):
-        self.output = CSRStatus(3)
+        self.output = CSRStorage(3)
 
         pu = Signal()
 
@@ -33,15 +33,15 @@ class RGBLed(Module, AutoCSR):
         self.specials += Instance("SB_RGB_DRV",
             i_RGBLEDEN = 0b1,
             i_RGBPU = pu,
-            i_RGB0PWM = self.output.status[0],
-            i_RGB1PWM = self.output.status[1],
-            i_RGB2PWM = self.output.status[2],
+            i_RGB0PWM = self.output.storage[0],
+            i_RGB1PWM = self.output.storage[1],
+            i_RGB2PWM = self.output.storage[2],
             o_RGB0 = pads.r,
             o_RGB1 = pads.g,
             o_RGB2 = pads.b,
-            p_RGB0_CURRENT = "0b000011",
-            p_RGB1_CURRENT = "0b000011",
-            p_RGB2_CURRENT = "0b000011",
+            p_RGB0_CURRENT = "0b000001",
+            p_RGB1_CURRENT = "0b000001",
+            p_RGB2_CURRENT = "0b000001",
         )
 
 class CRG(Module):
