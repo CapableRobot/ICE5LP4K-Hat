@@ -2,6 +2,8 @@
 import os
 import sys
 import argparse
+import shutil
+import pathlib
 
 from litex.soc.integration.builder import Builder
 
@@ -30,7 +32,15 @@ def main():
     builder = Builder(soc, output_dir="build", csr_csv="build/csr.csv", compile_software=False)
     builder.build()
 
-    print("Bitstream : {}".format(os.path.join(builder.gateware_dir, soc.build_name + ".bin")))
+    binfile = os.path.join(builder.gateware_dir, soc.build_name + ".bin")
+    csrfile = os.path.join(builder.gateware_dir, "..", "csr.csv")
+
+    gen_dir = os.path.join(pathlib.Path(__file__).parent.absolute(), "..", "generated")
+    
+    print("Bitstream : {}".format(binfile))
+
+    shutil.copy(binfile, gen_dir)
+    shutil.copy(csrfile, gen_dir)
 
 if __name__ == "__main__":
     main()
