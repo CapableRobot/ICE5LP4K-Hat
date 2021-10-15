@@ -2,6 +2,9 @@
 
 import time
 import sys
+import csv 
+import pathlib
+import os
 
 import spidev
 import RPi.GPIO as GPIO
@@ -17,6 +20,18 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(CS_PIN, GPIO.OUT)
 GPIO.output(CS_PIN, GPIO.HIGH)
+
+class CSR:
+
+    def __init__(self, csv_file):
+        self.items = list(csv.reader(filter(lambda row: row[0] != "#", open(csv_file))))
+        self.addresses = {}
+
+        for item in self.items:
+            group, name, addr, length, mode = item
+
+            if group == 'csr_register':
+                self.addresses[name] = int(addr, 16)
 
 class Bridge:
 
@@ -93,17 +108,37 @@ argstr = " ".join(sys.argv)
 
 if "-h" in argstr or "--help" in argstr or len(sys.argv) == 1:
     print("Usage: {} ADDR [DATA]".format(sys.argv[0]))
-    print("ADDR and DATA shoudl be hex formatted (e.g. 0x0804)")
+    print("ADDR and DATA can be hex formatted (e.g. 0x0804).")
+    print("DATA can also be binary formatted (e.g. 0b00000000) or decimal")
+    print("ADDR can also be a string which matches the register name in csr.csv")
     print("ADDR only will read that location and print it")
     print("ADDR + DATA will write DATA to ADDR")
     sys.exit(0)
 
-addr = int(sys.argv[1], 16)
+addr = sys.argv[1].lower()
+
+if addr[0] == 'x' or addr[0:2] == '0x':
+    addr = int(sys.argv[1], 16)
+else:
+    csrfile = os.path.join(pathlib.Path(__file__).parent.absolute(), "generated", "csr.csv")
+    csr = CSR(csrfile)
+    addr = csr.addresses[addr]
 
 bridge = Bridge()
 
 if len(sys.argv) == 2:
     print(bytes_to_hex(bridge.peek(addr)))
+
 elif len(sys.argv) == 3:
-    bridge.poke(addr, int(sys.argv[2], 16))
+    data = sys.argv[2].lower()
+
+    if data[0:2] == '0x':
+        data = int(data, 16)
+    elif data[0:2] == '0b':
+        data = int(data, 2)
+    else:
+        data = int(data)
+
+    bridge.poke(addr, data)
+
     print(bytes_to_hex(bridge.peek(addr)))
